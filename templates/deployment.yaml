@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.deployment.name }}
+  labels: {{- include "label" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.deployment.replicaCount }}
+  selector:
+    matchLabels:
+      db: mysql
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        db: mysql
+    spec:
+      securityContext:
+        runAsUser: 1000
+        fsGroup: 1000
+      containers:
+        - image: {{ .Values.deployment.image }}:{{ .Values.deployment.version }}
+          name: {{ .Values.deployment.name }}
+          env:
+          # Use secret in real usage
+          volumeMounts:
+            - name: mysql-persistent-storage
+              mountPath: {{ .Values.mysql.mountPath }}
+            - name: MYSQL_ROOT_PASSWORD
+              value: {{ .Values.mysql.rootPassword }}
+          ports:
+            - containerPort: {{ .Values.mysql.containerPort }}
+              name: {{ .Values.deployment.name }}
+      volumes:
+        - name: mysql-persistent-storage
+          persistentVolumeClaim:
+            claimName: sql-pv-claim       

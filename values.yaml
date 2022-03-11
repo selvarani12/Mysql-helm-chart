@@ -1,0 +1,18 @@
+# Default values for mysql-own.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+deployment:
+  name: mysql-new
+  image: mysql
+  version: 5.6
+  replicaCount: 2
+
+mysql:
+  rootPassword: root_pa$$word
+  containerPort: 3306
+  mountPath: /var/lib/mysql
+
+service:
+  name: mysql-service-1
+  port: 3306
